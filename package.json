@@ -1,0 +1,28 @@
+{
+  "name": "@dependahub/http",
+  "version": "0.0.0",
+  "description": "HTTP通信モジュール",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "xo && ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dependahub/http.git"
+  },
+  "keywords": [
+    "http",
+    "fetch"
+  ],
+  "author": "DependaHub (https://dependahub.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dependahub/http/issues"
+  },
+  "homepage": "https://github.com/dependahub/http#readme",
+  "devDependencies": {
+    "ava": "^6.2.0",
+    "xo": "^0.60.0"
+  }
+}
