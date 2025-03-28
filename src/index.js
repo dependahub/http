@@ -1,6 +1,5 @@
-import {HttpResponse} from './models/http-response.js';
 import {makeUrl} from './utils/make-url.js';
-import {HttpError} from './errors.js';
+import {makeResponse} from './utils/make-response.js';
 
 class Http {
 	defaults = {
@@ -35,34 +34,7 @@ class Http {
 			headers,
 		});
 
-		const {status, statusText} = fetchResponse;
-
-		let data;
-		switch (String(headers['Content-Type']).toLowerCase()) {
-			case 'application/json': {
-				data = await fetchResponse.json();
-				break;
-			}
-
-			default: {
-				data = await fetchResponse.text();
-				break;
-			}
-		}
-
-		if (!fetchResponse.ok) {
-			throw new HttpError(statusText, {
-				status,
-				statusText,
-				data,
-			});
-		}
-
-		return new HttpResponse({
-			status,
-			statusText,
-			data,
-		});
+		return makeResponse(fetchResponse, headers);
 	}
 
 	/**
@@ -94,34 +66,69 @@ class Http {
 			body: JSON.stringify(body),
 		});
 
-		const {status, statusText} = fetchResponse;
+		return makeResponse(fetchResponse, headers);
+	}
 
-		let data;
-		switch (String(headers['Content-Type']).toLowerCase()) {
-			case 'application/json': {
-				data = await fetchResponse.json();
-				break;
-			}
+	/**
+	 * @param {string} url
+	 * @param {object} options
+	 * @param {object} options.query
+	 * @param {object} options.headers
+	 * @param {object} options.body
+	 * @returns {Promise<HttpResponse>}
+	 * @throws {HttpError}
+	 */
+	async put(url, options = {}) {
+		const {baseUrl, headers: defaultHeaders = {}} = this.defaults;
+		const {query = {}, headers: optionHeadrs = {}, body} = options || {};
 
-			default: {
-				data = await fetchResponse.text();
-				break;
-			}
-		}
-
-		if (!fetchResponse.ok) {
-			throw new HttpError(statusText, {
-				status,
-				statusText,
-				data,
-			});
-		}
-
-		return new HttpResponse({
-			status,
-			statusText,
-			data,
+		const requestUrl = makeUrl({
+			baseUrl,
+			url,
+			query: query || {},
 		});
+		const headers = {
+			...defaultHeaders,
+			...optionHeadrs,
+		};
+
+		const fetchResponse = await fetch(requestUrl, {
+			method: 'PUT',
+			headers,
+			body: JSON.stringify(body),
+		});
+
+		return makeResponse(fetchResponse, headers);
+	}
+
+	/**
+	 * @param {string} url
+	 * @param {object} options
+	 * @param {object} options.query
+	 * @param {object} options.headers
+	 * @returns {Promise<HttpResponse>}
+	 * @throws {HttpError}
+	 */
+	async delete(url, options = {}) {
+		const {baseUrl, headers: defaultHeaders = {}} = this.defaults;
+		const {query = {}, headers: optionHeadrs = {}} = options || {};
+
+		const requestUrl = makeUrl({
+			baseUrl,
+			url,
+			query: query || {},
+		});
+		const headers = {
+			...defaultHeaders,
+			...optionHeadrs,
+		};
+
+		const fetchResponse = await fetch(requestUrl, {
+			method: 'DELETE',
+			headers,
+		});
+
+		return makeResponse(fetchResponse, headers);
 	}
 }
 
